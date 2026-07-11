@@ -48,10 +48,8 @@ export default function LoginPage() {
       style={{
         minHeight: "100vh",
         display: "flex",
-        flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "center",
-        gap: 20,
         padding: 20,
         background: `
           repeating-linear-gradient(0deg, ${COLORS.grid} 0px, transparent 1px, transparent 32px, ${COLORS.grid} 33px),
@@ -62,17 +60,26 @@ export default function LoginPage() {
         fontFamily: "var(--font-sans), sans-serif",
       }}
     >
-      <InfoPanel />
-      <form
-        onSubmit={handleSubmit}
+      <div
         style={{
-          position: "relative",
-          background: COLORS.panel,
-          width: 360,
-          border: `1px solid ${COLORS.grid}`,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          gap: 20,
         }}
       >
+        <InfoPanel />
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            position: "relative",
+            background: COLORS.panel,
+            width: 360,
+            border: `1px solid ${COLORS.grid}`,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          }}
+        >
         {/* corner tick marks, like a drawing sheet border */}
         {[
           { top: -1, left: -1, borderWidth: "2px 0 0 2px" },
@@ -178,6 +185,7 @@ export default function LoginPage() {
           REV. 01 — INTERNAL USE ONLY
         </div>
       </form>
+      </div>
     </div>
   );
 }
@@ -211,14 +219,22 @@ function InfoPanel() {
           ABOUT THIS TOOL
         </div>
         <div style={{ fontSize: 15, fontWeight: 600, color: COLORS.text, lineHeight: 1.5 }}>
-          OBJ形式の3Dモデルを、CADソフトを使わずにブラウザー画面に表示できます。ファイルの中身は外部に送信されません。
+          OBJ形式の3Dモデルを、CADソフトなし・アップロードなしでブラウザ上に表示するツールです。
         </div>
       </div>
+
+      <InfoRow label="動作の仕組み">
+        データはサーバーに送信されず、すべてお使いのブラウザ内だけで処理されます。ファイルはローカルに留まります。
+      </InfoRow>
       <InfoRow label="必要なもの">
         形状データの <Mono>.obj</Mono> ファイル。色・材質を表示したい場合は、同名の <Mono>.mtl</Mono> ファイルも一緒に選択してください（任意）。
       </InfoRow>
       <InfoRow label="お問い合わせ" last>
-        ご質問・ご要望は衣笠までお問い合わせください。
+        ご質問・ご要望は{" "}
+        <a href="mailto:s.kinugasa@hrts.co.jp" style={{ color: COLORS.amber }}>
+          s.kinugasa@hrts.co.jp
+        </a>{" "}
+        まで。
       </InfoRow>
     </div>
   );
