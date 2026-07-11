@@ -191,6 +191,12 @@ function ViewerClient() {
         target.z + radius * Math.sin(phi) * Math.cos(theta)
       );
       camera.lookAt(target);
+      // Keep the "near" clipping distance proportional to how close the
+      // camera currently is — otherwise zooming in past a fixed near value
+      // clips straight through the model instead of just getting closer.
+      camera.near = Math.max(0.001, radius * 0.01);
+      camera.far = Math.max(1000, radius * 50);
+      camera.updateProjectionMatrix();
     }
     update();
 
@@ -261,8 +267,8 @@ function ViewerClient() {
         // for camera position, so nothing can desync on the next interaction.
         theta = 0.8;
         phi = 1.0;
-        minRadius = maxDim * 0.05;
-        maxRadius = maxDim * 15;
+        minRadius = maxDim * 0.005;
+        maxRadius = maxDim * 20;
         radius = maxDim * 1.8;
         target.set(0, 0, 0);
         update();
