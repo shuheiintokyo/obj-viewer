@@ -18,7 +18,7 @@ export default function ViewerPage() {
   function initScene() {
     const holder = holderRef.current;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a);
+    scene.background = new THREE.Color(0x0b1e33);
     const camera = new THREE.PerspectiveCamera(
       45,
       holder.clientWidth / holder.clientHeight,
@@ -39,7 +39,7 @@ export default function ViewerPage() {
     dl2.position.set(-100, 50, -100);
     scene.add(dl2);
 
-    const grid = new THREE.GridHelper(400, 40, 0x333333, 0x262626);
+    const grid = new THREE.GridHelper(400, 40, 0x2a4a6e, 0x1a3350);
     scene.add(grid);
 
     let dragging = false,
@@ -166,35 +166,60 @@ export default function ViewerPage() {
   }
 
   return (
-    <div style={{ height: "100vh", width: "100vw", position: "relative", background: "#1a1a1a" }}>
+    <div style={{ height: "100vh", width: "100vw", position: "relative", background: "#0B1E33" }}>
       <div
         style={{
           position: "absolute",
           top: 12,
           left: 12,
           zIndex: 10,
-          background: "rgba(20,20,20,0.85)",
-          padding: 14,
-          borderRadius: 10,
-          color: "#eee",
-          fontFamily: '-apple-system, "Hiragino Kaku Gothic ProN", sans-serif',
+          background: "rgba(20,42,66,0.92)",
+          border: "1px solid #1E3A56",
+          borderLeft: "2px solid #E8A33D",
+          padding: "14px 16px",
+          color: "#EAF2FA",
+          fontFamily: 'var(--font-sans), sans-serif',
           maxWidth: 280,
         }}
       >
-        <h1 style={{ fontSize: 15, margin: "0 0 10px 0" }}>3D モデルビューアー</h1>
+        <div
+          style={{
+            fontFamily: "var(--font-mono), monospace",
+            fontSize: 10,
+            letterSpacing: "0.12em",
+            color: "#E8A33D",
+            marginBottom: 6,
+          }}
+        >
+          3D VIEWER
+        </div>
+        <h1 style={{ fontSize: 15, margin: "0 0 12px 0", fontWeight: 600 }}>3D モデルビューアー</h1>
         <input
           type="file"
           multiple
           accept=".obj,.mtl"
           onChange={(e) => handleFiles(e.target.files)}
-          style={{ color: "#eee", fontSize: 12, marginBottom: 8 }}
+          style={{ color: "#EAF2FA", fontSize: 12, marginBottom: 8 }}
         />
-        <p style={{ fontSize: 11, color: "#888", margin: "8px 0 0 0" }}>
+        <p style={{ fontSize: 11, color: "#7C93AC", margin: "8px 0 0 0", lineHeight: 1.5 }}>
           .obj ファイル（と任意で同名の .mtl）を選択してください。
           <br />
           ドラッグで回転、ホイールでズーム。
         </p>
-        {status && <p style={{ fontSize: 12, marginTop: 10, color: "#9c9" }}>{status}</p>}
+        {status && (
+          <p
+            style={{
+              fontFamily: "var(--font-mono), monospace",
+              fontSize: 11.5,
+              marginTop: 12,
+              paddingTop: 10,
+              borderTop: "1px solid #1E3A56",
+              color: "#8FD19E",
+            }}
+          >
+            {status}
+          </p>
+        )}
       </div>
       <button
         onClick={handleLogout}
@@ -203,12 +228,13 @@ export default function ViewerPage() {
           top: 12,
           right: 12,
           zIndex: 10,
-          background: "#2b2b2b",
-          color: "#eee",
-          border: "1px solid #444",
-          borderRadius: 6,
-          padding: "8px 14px",
-          fontSize: 12,
+          background: "#142A42",
+          color: "#EAF2FA",
+          border: "1px solid #1E3A56",
+          padding: "9px 16px",
+          fontFamily: "var(--font-mono), monospace",
+          fontSize: 11.5,
+          letterSpacing: "0.04em",
           cursor: "pointer",
         }}
       >
