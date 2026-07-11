@@ -30,7 +30,9 @@ export async function POST(request) {
       secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      // No maxAge: this makes it a session cookie, cleared when the browser
+      // is fully closed (not just the tab) — so each new browser session
+      // requires logging in again, rather than staying signed in for days.
     });
     return res;
   }

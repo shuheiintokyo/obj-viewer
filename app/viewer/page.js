@@ -164,7 +164,9 @@ export default function ViewerPage() {
       lastY = 0,
       theta = 0.8,
       phi = 1.0,
-      radius = 250;
+      radius = 250,
+      minRadius = 5,
+      maxRadius = 5000;
     const target = new THREE.Vector3(0, 0, 0);
 
     function update() {
@@ -201,7 +203,11 @@ export default function ViewerPage() {
       "wheel",
       (e) => {
         e.preventDefault();
-        radius = Math.max(5, Math.min(5000, radius * (1 + e.deltaY * 0.001)));
+        // Trackpads can fire many wheel events in a single scroll gesture,
+        // each with a large deltaY — without clamping this, one "scroll" can
+        // compound into a huge, disorienting jump. Cap each event's effect.
+        const clampedDelta = Math.max(-50, Math.min(50, e.deltaY));
+        radius = Math.max(minRadius, Math.min(maxRadius, radius * (1 + clampedDelta * 0.001)));
         update();
         clearAnnotations();
       },
@@ -231,8 +237,12 @@ export default function ViewerPage() {
       target,
       grid,
       setRadius: (r) => (radius = r),
+      setBounds: (min, max) => {
+        minRadius = min;
+        maxRadius = max;
+      },
       zoomBy: (factor) => {
-        radius = Math.max(5, Math.min(5000, radius * factor));
+        radius = Math.max(minRadius, Math.min(maxRadius, radius * factor));
         update();
       },
     };
@@ -246,8 +256,9 @@ export default function ViewerPage() {
     box.getCenter(center);
     object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 100;
-    const { camera, target, setRadius } = sceneRef.current;
+    const { camera, target, setRadius, setBounds } = sceneRef.current;
     target.set(0, 0, 0);
+    setBounds(maxDim * 0.05, maxDim * 15);
     setRadius(maxDim * 1.8);
     camera.position.set(maxDim * 1.2, maxDim, maxDim * 1.2);
     camera.lookAt(target);
@@ -308,8 +319,11 @@ export default function ViewerPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/";
+    const res = await fetch("/api/logout", { method: "POST" });
+    if (!res.ok) {
+      console.error("Logout request failed");
+    }
+    window.location.replace("/");
   }
 
   // --- Annotation overlay pointer handlers ---
