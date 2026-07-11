@@ -3,14 +3,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const COLORS = {
-  bg: "#0B1E33",
-  panel: "#142A42",
-  grid: "#1E3A56",
+  bg: "#EEF2F6",
+  panel: "#FFFFFF",
+  grid: "#D5DCE3",
   amber: "#E8A33D",
   amberDim: "#B87F2A",
-  text: "#EAF2FA",
-  muted: "#7C93AC",
-  danger: "#E8746A",
+  text: "#16324A",
+  muted: "#5A7387",
+  danger: "#C94A3E",
 };
 
 export default function LoginPage() {
@@ -226,15 +226,8 @@ function InfoPanel() {
       <InfoRow label="動作の仕組み">
         データはサーバーに送信されず、すべてお使いのブラウザ内だけで処理されます。ファイルはローカルに留まります。
       </InfoRow>
-      <InfoRow label="必要なもの">
+      <InfoRow label="必要なもの" last>
         形状データの <Mono>.obj</Mono> ファイル。色・材質を表示したい場合は、同名の <Mono>.mtl</Mono> ファイルも一緒に選択してください（任意）。
-      </InfoRow>
-      <InfoRow label="お問い合わせ" last>
-        ご質問・ご要望は{" "}
-        <a href="mailto:s.kinugasa@hrts.co.jp" style={{ color: COLORS.amber }}>
-          s.kinugasa@hrts.co.jp
-        </a>{" "}
-        まで。
       </InfoRow>
     </div>
   );

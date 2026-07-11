@@ -27,7 +27,7 @@ function ViewerClient() {
   const sceneRef = useRef(null);
   const [fileName, setFileName] = useState("");
   const [status, setStatus] = useState("");
-  const [bgMode, setBgMode] = useState("dark");
+  const [bgMode, setBgMode] = useState("light");
 
   // Annotation UI state (mirrored into refs so the Three.js event handlers,
   // which are attached once on mount, always see the latest values)
@@ -148,7 +148,7 @@ function ViewerClient() {
   function initScene() {
     const holder = holderRef.current;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(THEMES.dark.bg);
+    scene.background = new THREE.Color(THEMES.light.bg);
     const camera = new THREE.PerspectiveCamera(
       45,
       holder.clientWidth / holder.clientHeight,
@@ -171,7 +171,7 @@ function ViewerClient() {
     dl2.position.set(-100, 50, -100);
     scene.add(dl2);
 
-    const grid = new THREE.GridHelper(400, 40, THEMES.dark.gridMain, THEMES.dark.gridSub);
+    const grid = new THREE.GridHelper(400, 40, THEMES.light.gridMain, THEMES.light.gridSub);
     scene.add(grid);
 
     let dragging = false,

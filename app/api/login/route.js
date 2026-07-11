@@ -1,44 +1,309 @@
-import { NextResponse } from "next/server";
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-async function sha256(text) {
-  const enc = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest("SHA-256", enc);
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+const COLORS = {
+  bg: "#EEF2F6",
+  panel: "#FFFFFF",
+  grid: "#D5DCE3",
+  amber: "#E8A33D",
+  amberDim: "#B87F2A",
+  text: "#16324A",
+  muted: "#5A7387",
+  danger: "#C94A3E",
+};
+
+export default function LoginPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        router.push("/viewer");
+      } else {
+        setError(data.error || "ログインに失敗しました。");
+      }
+    } catch (err) {
+      setError("通信エラーが発生しました。");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20,
+        background: `
+          repeating-linear-gradient(0deg, ${COLORS.grid} 0px, transparent 1px, transparent 32px, ${COLORS.grid} 33px),
+          repeating-linear-gradient(90deg, ${COLORS.grid} 0px, transparent 1px, transparent 32px, ${COLORS.grid} 33px),
+          ${COLORS.bg}
+        `,
+        backgroundBlendMode: "overlay, overlay, normal",
+        fontFamily: "var(--font-sans), sans-serif",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          gap: 20,
+        }}
+      >
+        <InfoPanel />
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            position: "relative",
+            background: COLORS.panel,
+            width: 360,
+            border: `1px solid ${COLORS.grid}`,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+          }}
+        >
+        {/* corner tick marks, like a drawing sheet border */}
+        {[
+          { top: -1, left: -1, borderWidth: "2px 0 0 2px" },
+          { top: -1, right: -1, borderWidth: "2px 2px 0 0" },
+          { bottom: -1, left: -1, borderWidth: "0 0 2px 2px" },
+          { bottom: -1, right: -1, borderWidth: "0 2px 2px 0" },
+        ].map((pos, i) => (
+          <span
+            key={i}
+            style={{
+              position: "absolute",
+              width: 14,
+              height: 14,
+              borderStyle: "solid",
+              borderColor: COLORS.amber,
+              ...pos,
+            }}
+          />
+        ))}
+
+        {/* title block header row */}
+        <div
+          style={{
+            borderBottom: `1px solid ${COLORS.grid}`,
+            padding: "18px 24px",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-mono), monospace",
+              fontSize: 11,
+              letterSpacing: "0.12em",
+              color: COLORS.amber,
+              marginBottom: 6,
+            }}
+          >
+            ACCESS CONTROL
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: COLORS.text }}>
+            3D モデルビューアー
+          </div>
+        </div>
+
+        <div style={{ padding: "20px 24px 24px 24px" }}>
+          <Field
+            label="EMAIL"
+            type="email"
+            value={email}
+            onChange={setEmail}
+          />
+          <Field
+            label="PASSWORD"
+            type="password"
+            value={password}
+            onChange={setPassword}
+          />
+
+          {error && (
+            <p
+              style={{
+                color: COLORS.danger,
+                fontSize: 12.5,
+                fontFamily: "var(--font-mono), monospace",
+                margin: "4px 0 16px 0",
+              }}
+            >
+              ! {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "11px 0",
+              marginTop: 16,
+              border: "none",
+              background: loading ? COLORS.amberDim : COLORS.amber,
+              color: "#1a1206",
+              fontFamily: "var(--font-mono), monospace",
+              fontWeight: 600,
+              fontSize: 13,
+              letterSpacing: "0.06em",
+              cursor: loading ? "default" : "pointer",
+            }}
+          >
+            {loading ? "確認中..." : "ログイン →"}
+          </button>
+        </div>
+
+        {/* footer strip like a drawing revision row */}
+        <div
+          style={{
+            borderTop: `1px solid ${COLORS.grid}`,
+            padding: "8px 24px",
+            fontFamily: "var(--font-mono), monospace",
+            fontSize: 10,
+            color: COLORS.muted,
+            letterSpacing: "0.04em",
+          }}
+        >
+          REV. 01 — INTERNAL USE ONLY
+        </div>
+      </form>
+      </div>
+    </div>
+  );
 }
 
-export async function POST(request) {
-  const { email, password } = await request.json();
+function InfoPanel() {
+  return (
+    <div
+      style={{
+        position: "relative",
+        background: COLORS.panel,
+        width: 360,
+        border: `1px solid ${COLORS.grid}`,
+        boxShadow: "0 20px 60px rgba(0,0,0,0.45)",
+      }}
+    >
+      <div
+        style={{
+          borderBottom: `1px solid ${COLORS.grid}`,
+          padding: "18px 24px",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-mono), monospace",
+            fontSize: 11,
+            letterSpacing: "0.12em",
+            color: COLORS.amber,
+            marginBottom: 6,
+          }}
+        >
+          ABOUT THIS TOOL
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: COLORS.text, lineHeight: 1.5 }}>
+          OBJ形式の3Dモデルを、CADソフトなし・アップロードなしでブラウザ上に表示するツールです。
+        </div>
+      </div>
 
-  const validEmail = process.env.AUTH_EMAIL || "";
-  const validPassword = process.env.AUTH_PASSWORD || "";
-  const secret = process.env.SESSION_SECRET || "";
+      <InfoRow label="動作の仕組み">
+        データはサーバーに送信されず、すべてお使いのブラウザ内だけで処理されます。ファイルはローカルに留まります。
+      </InfoRow>
+      <InfoRow label="必要なもの" last>
+        形状データの <Mono>.obj</Mono> ファイル。色・材質を表示したい場合は、同名の <Mono>.mtl</Mono> ファイルも一緒に選択してください（任意）。
+      </InfoRow>
+    </div>
+  );
+}
 
-  if (!validEmail || !validPassword || !secret) {
-    return NextResponse.json(
-      { ok: false, error: "サーバー側の環境変数が未設定です。" },
-      { status: 500 }
-    );
-  }
+function InfoRow({ label, children, last }) {
+  return (
+    <div
+      style={{
+        padding: "14px 24px",
+        borderBottom: last ? "none" : `1px solid ${COLORS.grid}`,
+      }}
+    >
+      <div
+        style={{
+          fontFamily: "var(--font-mono), monospace",
+          fontSize: 10.5,
+          letterSpacing: "0.1em",
+          color: COLORS.muted,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </div>
+      <div style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.6 }}>{children}</div>
+    </div>
+  );
+}
 
-  if (email === validEmail && password === validPassword) {
-    const token = await sha256(secret + validEmail);
-    const res = NextResponse.json({ ok: true });
-    res.cookies.set("session", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      // No maxAge: this makes it a session cookie, cleared when the browser
-      // is fully closed (not just the tab) — so each new browser session
-      // requires logging in again, rather than staying signed in for days.
-    });
-    return res;
-  }
+function Mono({ children }) {
+  return (
+    <span
+      style={{
+        fontFamily: "var(--font-mono), monospace",
+        color: COLORS.amber,
+        fontSize: 12.5,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
-  return NextResponse.json(
-    { ok: false, error: "メールアドレスまたはパスワードが違います。" },
-    { status: 401 }
+function Field({ label, type, value, onChange }) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label
+        style={{
+          display: "block",
+          fontFamily: "var(--font-mono), monospace",
+          fontSize: 10.5,
+          letterSpacing: "0.1em",
+          color: COLORS.muted,
+          marginBottom: 6,
+        }}
+      >
+        {label}
+      </label>
+      <input
+        type={type}
+        required
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          background: COLORS.bg,
+          border: `1px solid ${COLORS.grid}`,
+          color: COLORS.text,
+          fontSize: 14,
+          boxSizing: "border-box",
+          outline: "none",
+        }}
+        onFocus={(e) => (e.target.style.borderColor = COLORS.amber)}
+        onBlur={(e) => (e.target.style.borderColor = COLORS.grid)}
+      />
+    </div>
   );
 }
