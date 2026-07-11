@@ -30,8 +30,8 @@ In the Vercel project → **Settings → Environment Variables**, add:
 
 | Name            | Value                          |
 |-----------------|---------------------------------|
-| `AUTH_EMAIL`    | `s.kinugasa@hrts.co.jp`         |
-| `AUTH_PASSWORD` | `1234`                          |
+| `AUTH_EMAIL`    | ----------------------         |
+| `AUTH_PASSWORD` | ******                          |
 | `SESSION_SECRET`| any long random string you pick |
 
 Apply to all environments (Production, Preview, Development).
