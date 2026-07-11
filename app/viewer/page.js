@@ -223,7 +223,19 @@ export default function ViewerPage() {
     }
     loop();
 
-    sceneRef.current = { scene, camera, renderer, holder, target, grid, setRadius: (r) => (radius = r) };
+    sceneRef.current = {
+      scene,
+      camera,
+      renderer,
+      holder,
+      target,
+      grid,
+      setRadius: (r) => (radius = r),
+      zoomBy: (factor) => {
+        radius = Math.max(5, Math.min(5000, radius * factor));
+        update();
+      },
+    };
   }
 
   function frameObject(object) {
@@ -272,10 +284,19 @@ export default function ViewerPage() {
         obj = objLoader.parse(objText);
         obj.traverse((c) => {
           if (c.isMesh) {
-            c.material = new THREE.MeshStandardMaterial({ color: 0x999999 });
+            c.material = new THREE.MeshStandardMaterial({ color: 0x999999, side: THREE.DoubleSide });
           }
         });
       }
+      // Render both sides of every triangle: OBJ exports from CAD tools don't
+      // always have perfectly consistent face winding, which otherwise causes
+      // faces to vanish from certain viewing angles (backface culling).
+      obj.traverse((c) => {
+        if (c.isMesh && c.material) {
+          const mats = Array.isArray(c.material) ? c.material : [c.material];
+          mats.forEach((m) => (m.side = THREE.DoubleSide));
+        }
+      });
       obj.userData.isModel = true;
       scene.add(obj);
       frameObject(obj);
@@ -506,6 +527,59 @@ export default function ViewerPage() {
           }}
         >
           ログアウト
+        </button>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: 12,
+          right: 12,
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+        }}
+      >
+        <button
+          onClick={() => {
+            sceneRef.current?.zoomBy(0.9);
+            clearAnnotations();
+          }}
+          title="ズームイン"
+          style={{
+            width: 36,
+            height: 36,
+            background: "#142A42",
+            color: "#EAF2FA",
+            border: "1px solid #1E3A56",
+            fontSize: 18,
+            fontFamily: "var(--font-mono), monospace",
+            cursor: "pointer",
+            lineHeight: 1,
+          }}
+        >
+          +
+        </button>
+        <button
+          onClick={() => {
+            sceneRef.current?.zoomBy(1.1);
+            clearAnnotations();
+          }}
+          title="ズームアウト"
+          style={{
+            width: 36,
+            height: 36,
+            background: "#142A42",
+            color: "#EAF2FA",
+            border: "1px solid #1E3A56",
+            fontSize: 18,
+            fontFamily: "var(--font-mono), monospace",
+            cursor: "pointer",
+            lineHeight: 1,
+          }}
+        >
+          −
         </button>
       </div>
 
