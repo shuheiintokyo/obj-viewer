@@ -236,13 +236,20 @@ export default function ViewerPage() {
       holder,
       target,
       grid,
-      setRadius: (r) => (radius = r),
-      setBounds: (min, max) => {
-        minRadius = min;
-        maxRadius = max;
-      },
       zoomBy: (factor) => {
         radius = Math.max(minRadius, Math.min(maxRadius, radius * factor));
+        update();
+      },
+      frameTo: (maxDim) => {
+        // Reset theta/phi/radius together, then go through the same update()
+        // the drag/zoom handlers use — this is the single source of truth
+        // for camera position, so nothing can desync on the next interaction.
+        theta = 0.8;
+        phi = 1.0;
+        minRadius = maxDim * 0.05;
+        maxRadius = maxDim * 15;
+        radius = maxDim * 1.8;
+        target.set(0, 0, 0);
         update();
       },
     };
@@ -256,12 +263,7 @@ export default function ViewerPage() {
     box.getCenter(center);
     object.position.sub(center);
     const maxDim = Math.max(size.x, size.y, size.z) || 100;
-    const { camera, target, setRadius, setBounds } = sceneRef.current;
-    target.set(0, 0, 0);
-    setBounds(maxDim * 0.05, maxDim * 15);
-    setRadius(maxDim * 1.8);
-    camera.position.set(maxDim * 1.2, maxDim, maxDim * 1.2);
-    camera.lookAt(target);
+    sceneRef.current.frameTo(maxDim);
   }
 
   async function handleFiles(fileList) {
@@ -597,7 +599,11 @@ export default function ViewerPage() {
         </button>
       </div>
 
-      <div ref={holderRef} style={{ position: "absolute", inset: 0 }}>
+      <div style={{ position: "absolute", inset: 0 }}>
+        {/* React never renders anything inside this div — Three.js appends
+            its canvas here directly, so there's nothing for React's virtual
+            DOM to conflict with. */}
+        <div ref={holderRef} style={{ position: "absolute", inset: 0 }} />
         <canvas
           ref={penCanvasRef}
           style={{
