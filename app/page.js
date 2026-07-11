@@ -14,8 +14,7 @@ const COLORS = {
 };
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -28,7 +27,7 @@ export default function LoginPage() {
       const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ code }),
       });
       const data = await res.json();
       if (res.ok && data.ok) {
@@ -125,16 +124,10 @@ export default function LoginPage() {
 
         <div style={{ padding: "20px 24px 24px 24px" }}>
           <Field
-            label="EMAIL"
-            type="email"
-            value={email}
-            onChange={setEmail}
-          />
-          <Field
-            label="PASSWORD"
+            label="アクセスコード"
             type="password"
-            value={password}
-            onChange={setPassword}
+            value={code}
+            onChange={setCode}
           />
 
           {error && (

@@ -9,21 +9,20 @@ async function sha256(text) {
 }
 
 export async function POST(request) {
-  const { email, password } = await request.json();
+  const { code } = await request.json();
 
-  const validEmail = process.env.AUTH_EMAIL || "";
-  const validPassword = process.env.AUTH_PASSWORD || "";
+  const validCode = process.env.ACCESS_CODE || "";
   const secret = process.env.SESSION_SECRET || "";
 
-  if (!validEmail || !validPassword || !secret) {
+  if (!validCode || !secret) {
     return NextResponse.json(
       { ok: false, error: "サーバー側の環境変数が未設定です。" },
       { status: 500 }
     );
   }
 
-  if (email === validEmail && password === validPassword) {
-    const token = await sha256(secret + validEmail);
+  if (code === validCode) {
+    const token = await sha256(secret + validCode);
     const res = NextResponse.json({ ok: true });
     res.cookies.set("session", token, {
       httpOnly: true,
@@ -38,7 +37,7 @@ export async function POST(request) {
   }
 
   return NextResponse.json(
-    { ok: false, error: "メールアドレスまたはパスワードが違います。" },
+    { ok: false, error: "アクセスコードが違います。" },
     { status: 401 }
   );
 }

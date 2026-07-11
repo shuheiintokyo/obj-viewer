@@ -10,9 +10,9 @@ async function sha256(text) {
 
 export async function middleware(request) {
   const session = request.cookies.get("session")?.value;
-  const validEmail = process.env.AUTH_EMAIL || "";
+  const validCode = process.env.ACCESS_CODE || "";
   const secret = process.env.SESSION_SECRET || "";
-  const expected = await sha256(secret + validEmail);
+  const expected = await sha256(secret + validCode);
 
   if (session && session === expected) {
     const res = NextResponse.next();
