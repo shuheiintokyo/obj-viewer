@@ -15,10 +15,17 @@ export async function middleware(request) {
   const expected = await sha256(secret + validEmail);
 
   if (session && session === expected) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    // Belt-and-suspenders: explicitly forbid caching this response anywhere
+    // (CDN, browser, or otherwise) so a stale, already-authenticated page
+    // can never be served to someone who shouldn't have access.
+    res.headers.set("Cache-Control", "no-store, must-revalidate");
+    return res;
   }
   const loginUrl = new URL("/", request.url);
-  return NextResponse.redirect(loginUrl);
+  const res = NextResponse.redirect(loginUrl);
+  res.headers.set("Cache-Control", "no-store, must-revalidate");
+  return res;
 }
 
 export const config = {
